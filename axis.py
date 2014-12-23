@@ -65,21 +65,29 @@ class Axis:
 			constVelTimeEnd = accelAndVelTime
 			decelTimeEnd = totalMoveTime
 
+			self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds
 			### calculate current position
 			if movingTimeSeconds < accelTimeEnd:
 				# accelerating
-				self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds + 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
-			elif movingTimeSeconds < constVelTimeEnd:
-				# moving at constant speed
-				self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds + 0.5 * self.velocity * accelerationTime + (movingTimeSeconds - accelTimeEnd) * self.velocity
-			elif movingTimeSeconds < decelTimeEnd:
-				# decelerating
-				self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds + 0.5 * self.velocity * accelerationTime + self.velocity * constantVelTime + (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - decelTimeEnd)) * (movingTimeSeconds - decelTimeEnd)
+				self.currentPosition += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
 			else:
-				# move is done
-				self.currentPosition = self.targetPosition
-				self.lastPosition = self.targetPosition
+				# past the point of accelerating
+				self.currentPosition += 0.5 * self.acceleration * accelerationTime
 
+				if movingTimeSeconds < constVelTimeEnd:
+					# moving with constant speed
+					self.currentPosition += self.velocity * (movingTimeSeconds - accelTimeEnd)
+				else:
+					# past the point of moving with constant speed
+					self.currentPosition += self.velocity * constantVelTime
+
+					if movingTimeSeconds < decelTimeEnd:
+						# decelerating
+						self.currentPosition += (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - decelTimeEnd)) * (movingTimeSeconds - decelTimeEnd)
+					else:
+						# move is done
+						self.currentPosition = self.targetPosition
+						self.lastPosition = self.targetPosition
 
 		return self.currentPosition
 
