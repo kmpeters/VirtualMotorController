@@ -70,6 +70,7 @@ class Axis:
 	def readPosition(self):
 		if self.moveStartTime == None:
 			# axis isn't moving
+			# should stuff be reset here?
 			pass
 		else:
 			# axis is moving
@@ -102,14 +103,35 @@ class Axis:
 						# move is done
 						self.currentPosition = self.targetPosition
 						self.lastPosition = self.targetPosition
+						self.moveStartTime = None
 
 		return self.currentPosition
 
 	def setPosition(self):
 		return
 
+	# Does it make more sense to have an updateController() method that is called before each readStatus and readPosition call?
+
 	def readStatus(self):
-		return
+		# Update moving status
+		if self.moveStartTime == None:
+			self.status.setDoneMoving()
+		else:
+			# axis might still be moving
+			currentTime = datetime.datetime.now()
+
+			# calculate moving times
+			movingTimeDelta = currentTime - self.moveStartTime
+			movingTimeSeconds = movingTimeDelta.total_seconds()
+
+			if movingTimeSeconds < self.totalMoveDuration:
+				# move is in progress
+				self.status.setMoving()
+			else:
+				# move is done but neither position or status have been updated
+				self.status.setDoneMoving()
+
+		return self.status.doneMoving
 
 	def setVelocity(self, velocity):
 		self.velocity = velocity

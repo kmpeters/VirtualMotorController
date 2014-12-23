@@ -24,3 +24,12 @@ class Status:
 	def setError(self, flag, message):
 		self.error = flag
 		slef.errorMessage = message
+
+	def setMoving(self):
+		self.doneMoving = 0
+		self.moving = 1
+
+	def setDoneMoving(self):
+		self.doneMoving = 1
+		self.moving = 0
+

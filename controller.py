@@ -24,8 +24,13 @@ class Controller:
 
 if __name__ == '__main__':
 	myc = Controller()
+	pos = myc.axisList[0].readPosition()
+	st = myc.axisList[0].readStatus()
+	print st, pos
 	myc.axisList[0].move(5.0)
 	for i in range(65):
-		print myc.axisList[0].readPosition()
+		pos = myc.axisList[0].readPosition()
+		st = myc.axisList[0].readStatus()
+		print st, pos
 		time.sleep(0.1)
 
