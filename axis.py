@@ -83,7 +83,7 @@ class Axis:
 
 					if movingTimeSeconds < decelTimeEnd:
 						# decelerating
-						self.currentPosition += (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - decelTimeEnd)) * (movingTimeSeconds - decelTimeEnd)
+						self.currentPosition += (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - constVelTimeEnd)) * (movingTimeSeconds - constVelTimeEnd)
 					else:
 						# move is done
 						self.currentPosition = self.targetPosition
