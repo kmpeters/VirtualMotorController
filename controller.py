@@ -15,6 +15,7 @@ class Controller:
 	def __init__(self):
 		self.numAxes = 3
 		self.axisNameList = ['X','Y','Z']
+		self.commandDict = {3:{'MV':self.moveAxis}, 2:{'TP':self.queryPosition, 'ST':self.queryStatus}} 
 		self.axisDict = {}
 		self.axisList = []
 		self.enforceLimits = False
@@ -23,12 +24,36 @@ class Controller:
 			self.axisList.append( axis.Axis() )
 			self.axisDict[self.axisNameList[i]] = i
 
+	def handleCommand(self, command):
+		args = command.split(' ')
+		numArgs = len(args)
+		if numArgs < 2 or numArgs > 3:
+			retVal = "Argument error"
+		elif args[0] not in self.axisNameList:
+			retVal = "Axis name error"
+		elif numArgs == 2:
+			if args[1] in self.commandDict[numArgs].keys():
+				retVal = self.commandDict[numArgs][args[1]](args[0])
+			else:
+				retVal = "Command error"
+		elif numArgs == 3:
+			if args[1] in self.commandDict[numArgs].keys():
+				retVal = self.commandDict[numArgs][args[1]](args[0], args[2])
+			else:
+				retVal = "Command error"
+		else:
+			retVal = "Strange error"
+
+		return retVal
+
 	def queryPosition(self, axis):
 		return self.axisList[self.axisDict[axis]].readPosition()
 
 	def queryStatus(self, axis):
 		return self.axisList[self.axisDict[axis]].readStatus()
 
+	def moveAxis(self, axis, pos):
+		return self.axisList[self.axisDict[axis]].move(float(pos))
 
 class ConnectionDispatcher(asyncore.dispatcher):
 	def __init__(self, port):
@@ -68,7 +93,11 @@ class ConnectionHandler(asynchat.async_chat):
 		## handle actual commands here
 		print request
 
-		self.sendClientResponse("%s received" % request)
+		# Commands of form
+		# X MV 5.0
+		response = self.device.handleCommand(request)
+
+		self.sendClientResponse("%s" % response)
 		return
 
 	def sendClientResponse(self, response=""):

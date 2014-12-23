@@ -65,7 +65,7 @@ class Axis:
 			print "Constant Vel Duration:", self.constVelDuration, "seconds"
 			print "Decel Start Time:", self.decelStartTime, "seconds"
 
-		return
+		return "OK"
 
 	def readPosition(self):
 		if self.moveStartTime == None:
