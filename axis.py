@@ -25,6 +25,13 @@ class Axis:
 		self.lastPosition = 0.0
 		self.currentPosition = 0.0
 		self.targetPosition = 0.0
+		# Move info
+		self.accelDuration = 0.0
+		self.accelDistance = 0.0
+		self.moveDistance = 0.0
+		self.constVelDuration = 0.0
+		self.decelStartTime = 0.0
+		self.totalMoveDuration = 0.0
 		#
 		self.enforceLimits = False
 		#
@@ -41,6 +48,23 @@ class Axis:
 			#
 			self.moveStartTime = datetime.datetime.now()
 			self.targetPosition = targetPosition
+			# Calculate values needed for readback position calculation
+			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
+			self.accelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.accelDuration
+			self.moveDistance = self.targetPosition - self.lastPosition
+			self.constVelDuration = (self.moveDistance - 2 * self.accelDistance) / self.velocity
+			self.decelStartTime = self.accelDuration + self.constVelDuration
+			self.totalMoveDuration = 2 * self.accelDuration + self.constVelDuration
+
+			print "Start Pos:", self.lastPosition, self.units
+			print "End Pos:", self.targetPosition, self.units
+			print "Move Distance:", self.moveDistance, self.units
+			print "Move Duration:", self.totalMoveDuration, "seconds"
+			print "Accel Duration:", self.accelDuration, "seconds"
+			print "Accel Distance:", self.accelDistance, self.units
+			print "Constant Vel Duration:", self.constVelDuration, "seconds"
+			print "Decel Start Time:", self.decelStartTime, "seconds"
+
 		return
 
 	def readPosition(self):
@@ -52,35 +76,28 @@ class Axis:
 			currentTime = datetime.datetime.now()
 
 			# calculate moving times
-			accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
-			acclDistance = 0.5 * (self.velocity - self.baseVelocity) * accelDuration
-			moveDistance = self.targetPosition - self.lastPosition
-			constVelDuration = (moveDistance - 2 * acclDistance) / self.velocity
-			decelStartTime = accelDuration + constVelDuration
-			totalMoveDuration = 2 * accelDuration + constVelDuration
-
 			movingTimeDelta = currentTime - self.moveStartTime
 			movingTimeSeconds = movingTimeDelta.total_seconds()
 
 			self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds
 			### calculate current position
-			if movingTimeSeconds < accelDuration:
+			if movingTimeSeconds < self.accelDuration:
 				# accelerating
 				self.currentPosition += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
 			else:
 				# past the point of accelerating
-				self.currentPosition += 0.5 * self.acceleration * accelDuration
+				self.currentPosition += 0.5 * self.acceleration * self.accelDuration
 
-				if movingTimeSeconds < decelStartTime:
+				if movingTimeSeconds < self.decelStartTime:
 					# moving with constant speed
-					self.currentPosition += self.velocity * (movingTimeSeconds - accelDuration)
+					self.currentPosition += self.velocity * (movingTimeSeconds - self.accelDuration)
 				else:
 					# past the point of moving with constant speed
-					self.currentPosition += self.velocity * constVelDuration
+					self.currentPosition += self.velocity * self.constVelDuration
 
-					if movingTimeSeconds < totalMoveDuration:
+					if movingTimeSeconds < self.totalMoveDuration:
 						# decelerating
-						self.currentPosition += (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - decelStartTime)) * (movingTimeSeconds - decelStartTime)
+						self.currentPosition += (self.velocity - 0.5 * self.acceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
 					else:
 						# move is done
 						self.currentPosition = self.targetPosition
