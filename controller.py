@@ -35,25 +35,30 @@ class Controller:
 			self.axisDict[self.axisNameList[i]] = i
 
 	def handleCommand(self, command):
-		args = command.split(' ')
-		numArgs = len(args)
-		print args
-		if numArgs < 2 or numArgs > 3:
-			retVal = "Argument error"
-		elif args[0] not in self.axisNameList:
-			retVal = "Axis name error"
-		elif numArgs == 2:
-			if args[1] in self.commandDict[numArgs].keys():
-				retVal = self.commandDict[numArgs][args[1]](args[0])
-			else:
-				retVal = "Command error"
-		elif numArgs == 3:
-			if args[1] in self.commandDict[numArgs].keys():
-				retVal = self.commandDict[numArgs][args[1]](args[0], args[2])
-			else:
-				retVal = "Command error"
+		# Check for empty command string
+		if command == '':
+			retVal = None
 		else:
-			retVal = "Strange error"
+			args = command.split(' ')
+			numArgs = len(args)
+			#!print args
+			# Check for incorrect number of args
+			if numArgs not in self.commandDict.keys():
+				retVal = "Argument error"
+			# Check for incorrect axis names
+			elif args[0] not in self.axisNameList:
+				retVal = "Axis name error"
+			else:
+				# Check for invalid commands
+				if args[1] not in self.commandDict[numArgs].keys():
+					retVal = "Command error"
+				else:
+					if numArgs == 2:
+						retVal = self.commandDict[numArgs][args[1]](args[0])
+					elif numArgs == 3:
+						retVal = self.commandDict[numArgs][args[1]](args[0], args[2])
+					else:
+						retVal = "Strange error"
 
 		return retVal
 
@@ -132,7 +137,9 @@ class ConnectionHandler(asynchat.async_chat):
 		# X MV 5.0
 		response = self.device.handleCommand(request)
 
-		self.sendClientResponse("%s" % response)
+		if response != None:
+			self.sendClientResponse("%s" % response)
+
 		return
 
 	def sendClientResponse(self, response=""):
