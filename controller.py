@@ -15,7 +15,17 @@ class Controller:
 	def __init__(self):
 		self.numAxes = 3
 		self.axisNameList = ['X','Y','Z']
-		self.commandDict = {3:{'MV':self.moveAxis}, 2:{'TP':self.queryPosition, 'ST':self.queryStatus}} 
+		self.commandDict = {3:{'MV':self.moveAxis, 
+		                       'ACC':self.setAcceleration, 
+				       'VEL':self.setVelocity,
+				       'LL':self.setLowLimit,
+				       'HL':self.setHighLimit}, 
+		                    2:{'POS?':self.queryPosition, 
+				       'ST?':self.queryStatus,
+				       'ACC?':self.queryAcceleration,
+				       'VEL?':self.queryVelocity,
+				       'LL?':self.queryLowLimit,
+				       'HL?':self.queryHighLimit}} 
 		self.axisDict = {}
 		self.axisList = []
 		self.enforceLimits = False
@@ -27,6 +37,7 @@ class Controller:
 	def handleCommand(self, command):
 		args = command.split(' ')
 		numArgs = len(args)
+		print args
 		if numArgs < 2 or numArgs > 3:
 			retVal = "Argument error"
 		elif args[0] not in self.axisNameList:
@@ -54,6 +65,30 @@ class Controller:
 
 	def moveAxis(self, axis, pos):
 		return self.axisList[self.axisDict[axis]].move(float(pos))
+
+	def setVelocity(self, axis, velocity):
+		return self.axisList[self.axisDict[axis]].setVelocity(float(velocity))
+
+	def queryVelocity(self, axis):
+		return self.axisList[self.axisDict[axis]].readVelocity()
+
+	def setAcceleration(self, axis, acceleration):
+		return self.axisList[self.axisDict[axis]].setAcceleration(float(acceleration))
+
+	def queryAcceleration(self, axis):
+		return self.axisList[self.axisDict[axis]].readAcceleration()
+
+	def queryHighLimit(self, axis):
+		return self.axisList[self.axisDict[axis]].readHighLimit()
+
+	def setHighLimit(self, axis, highLimit):
+		return self.axisList[self.axisDict[axis]].setHighLimit(float(highLimit))
+
+	def queryLowLimit(self, axis):
+		return self.axisList[self.axisDict[axis]].readLowLimit()
+
+	def setLowLimit(self, axis, lowLimit):
+		return  self.axisList[self.axisDict[axis]].setLowLimit(float(lowLimit))
 
 class ConnectionDispatcher(asyncore.dispatcher):
 	def __init__(self, port):

@@ -16,7 +16,7 @@ class Axis:
 		self.acceleration = 1.0
 		#
 		self.highLimit = 100.0
-		self.lowLimit = 100.0
+		self.lowLimit = -100.0
 		#
 		self.units = "counts"
 		self.resolution = 1.0
@@ -135,14 +135,14 @@ class Axis:
 
 	def setVelocity(self, velocity):
 		self.velocity = velocity
-		return
+		return "OK"
 
 	def readVelocity(self):
 		return self.velocity
 
 	def setAcceleration(self, acceleration):
 		self.acceleration = acceleration
-		return
+		return "OK"
 
 	def readAcceleration(self):
 		return self.acceleration
@@ -152,12 +152,12 @@ class Axis:
 
 	def setHighLimit(self, highLimit):
 		self.highLimit = highLimit
-		return
+		return "OK"
 
 	def readLowLimit(self):
 		return self.lowLimit
 
 	def setLowLimit(self, lowLimit):
 		self.lowLimit = lowLimit
-		return 
+		return  "OK"
 
