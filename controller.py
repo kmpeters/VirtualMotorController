@@ -123,7 +123,7 @@ class ConnectionHandler(asynchat.async_chat):
 		asynchat.async_chat.__init__(self, conn)
 		self.set_terminator("\r")
 		#
-		self.outputTerminator = ";\r\n"
+		self.outputTerminator = "\r\n"
 		self.device = device
 		self.buffer = ""
 
