@@ -15,6 +15,8 @@ class Controller:
 	def __init__(self):
 		self.numAxes = 3
 		self.axisNameList = ['X','Y','Z']
+		self.axisNumberList = [str(x) for x in range(1, self.numAxes+1)]
+
 		self.commandDict = {3:{'MV':self.moveAxis, 
 		                       'ACC':self.setAcceleration, 
 				       'VEL':self.setVelocity,
@@ -33,6 +35,10 @@ class Controller:
 		for i in range(self.numAxes):
 			self.axisList.append( axis.Axis() )
 			self.axisDict[self.axisNameList[i]] = i
+			self.axisDict[self.axisNumberList[i]] = i
+
+		#!print self.axisDict
+		#!print self.axisDict.keys()
 
 	def handleCommand(self, command):
 		# Check for empty command string
@@ -42,11 +48,12 @@ class Controller:
 			args = command.split(' ')
 			numArgs = len(args)
 			#!print args
+			#!print self.axisDict.keys()
 			# Check for incorrect number of args
 			if numArgs not in self.commandDict.keys():
 				retVal = "Argument error"
 			# Check for incorrect axis names
-			elif args[0] not in self.axisNameList:
+			elif args[0] not in self.axisDict.keys():
 				retVal = "Axis name error"
 			else:
 				# Check for invalid commands
