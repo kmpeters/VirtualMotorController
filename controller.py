@@ -141,7 +141,7 @@ class ConnectionHandler(asynchat.async_chat):
 		print request
 
 		# Commands of form
-		# X MV 5.0
+		# X MV 400
 		response = self.device.handleCommand(request)
 
 		if response != None:
