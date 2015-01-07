@@ -14,6 +14,7 @@ class Axis:
 		self.baseVelocity = 0
 		# units / second / second
 		self.acceleration = 400
+		self.deceleration = 400
 		#
 		self.highLimit = 40000
 		self.lowLimit = -40000
@@ -49,6 +50,16 @@ class Axis:
 			#
 			self.moveStartTime = datetime.datetime.now()
 			self.targetPosition = int(round(targetPosition)
+			
+			# |
+			# |
+			# |      _________
+			# |     /         \
+			# |    /           \
+			# |   /             \
+			# L__|_______________|__
+			#
+			
 			# Calculate values needed for readback position calculation
 			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
 			self.accelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.accelDuration
@@ -59,10 +70,13 @@ class Axis:
 
 			print "Start Pos:", self.lastPosition, self.units
 			print "End Pos:", self.targetPosition, self.units
+
 			print "Move Distance:", self.moveDistance, self.units
 			print "Move Duration:", self.totalMoveDuration, "seconds"
+
 			print "Accel Duration:", self.accelDuration, "seconds"
 			print "Accel Distance:", self.accelDistance, self.units
+
 			print "Constant Vel Duration:", self.constVelDuration, "seconds"
 			print "Decel Start Time:", self.decelStartTime, "seconds"
 
@@ -148,6 +162,7 @@ class Axis:
 
 	def setAcceleration(self, acceleration):
 		self.acceleration = acceleration
+		self.deceleration = acceleration
 		return "OK"
 
 	def readAcceleration(self):
