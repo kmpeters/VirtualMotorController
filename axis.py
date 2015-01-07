@@ -22,6 +22,7 @@ class Axis:
 		self.resolution = 1.0
 		#
 		self.moveStartTime = None
+		self.abortTime = None
 		self.lastPosition = 0
 		self.currentPosition = 0
 		self.targetPosition = 0
@@ -47,7 +48,7 @@ class Axis:
 		else:
 			#
 			self.moveStartTime = datetime.datetime.now()
-			self.targetPosition = targetPosition
+			self.targetPosition = int(round(targetPosition)
 			# Calculate values needed for readback position calculation
 			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
 			self.accelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.accelDuration
@@ -65,6 +66,10 @@ class Axis:
 			print "Constant Vel Duration:", self.constVelDuration, "seconds"
 			print "Decel Start Time:", self.decelStartTime, "seconds"
 
+		return "OK"
+
+	def stop(self):
+		self.abortTime = datetime.datetime.now()
 		return "OK"
 
 	def readPosition(self):

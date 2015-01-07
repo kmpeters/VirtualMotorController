@@ -21,7 +21,8 @@ class Controller:
 		                       'ACC':self.setAcceleration, 
 				       'VEL':self.setVelocity,
 				       'LL':self.setLowLimit,
-				       'HL':self.setHighLimit}, 
+				       'HL':self.setHighLimit,
+				       'AB':self.stopAxis},
 		                    2:{'POS?':self.queryPosition, 
 				       'ST?':self.queryStatus,
 				       'ACC?':self.queryAcceleration,
@@ -77,6 +78,9 @@ class Controller:
 
 	def moveAxis(self, axis, pos):
 		return self.axisList[self.axisDict[axis]].move(float(pos))
+
+	def stopAxis(self, axis):
+		return self.axisList[self.axisDict[axis]].stop()
 
 	def setVelocity(self, axis, velocity):
 		return self.axisList[self.axisDict[axis]].setVelocity(float(velocity))
