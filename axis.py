@@ -28,6 +28,7 @@ class Axis:
 		self.lastPosition = 0
 		self.currentPosition = 0
 		self.targetPosition = 0
+		self.direction = 0
 		# Move info
 		self.accelDuration = 0.0
 		self.accelDistance = 0
@@ -62,6 +63,14 @@ class Axis:
 			# |   /             \
 			# L__|_______________|__
 			#
+			
+			# Calculate direction
+			if self.targetPosition < self.lastPosition:
+				# Move is negative
+				self.direction = 0
+			else:
+				# Move is positive
+				self.direction = 1
 			
 			# Calculate values needed for readback position calculation
 			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
