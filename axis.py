@@ -24,12 +24,15 @@ class Axis:
 		#
 		self.moveStartTime = None
 		self.abortTime = None
+		#
 		self.lastPosition = 0
 		self.currentPosition = 0
 		self.targetPosition = 0
 		# Move info
 		self.accelDuration = 0.0
 		self.accelDistance = 0
+		self.decelDuration = 0.0
+		self.decelDistance = 0
 		self.moveDistance = 0
 		self.constVelDuration = 0.0
 		self.decelStartTime = 0.0
@@ -63,22 +66,30 @@ class Axis:
 			# Calculate values needed for readback position calculation
 			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
 			self.accelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.accelDuration
+
+			self.decelDuration = (self.velocity - self.baseVelocity) / self.deceleration
+			self.decelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.decelDuration
+
 			self.moveDistance = abs(self.targetPosition - self.lastPosition)
-			self.constVelDuration = (self.moveDistance - 2 * self.accelDistance) / self.velocity
+
+			self.constVelDuration = (self.moveDistance - self.accelDistance - self.decelDistance) / self.velocity
+
 			self.decelStartTime = self.accelDuration + self.constVelDuration
-			self.totalMoveDuration = 2 * self.accelDuration + self.constVelDuration
+			self.totalMoveDuration = self.decelStartTime + self.decelDuration
 
 			print "Start Pos:", self.lastPosition, self.units
 			print "End Pos:", self.targetPosition, self.units
-
 			print "Move Distance:", self.moveDistance, self.units
 			print "Move Duration:", self.totalMoveDuration, "seconds"
-
+			print
 			print "Accel Duration:", self.accelDuration, "seconds"
 			print "Accel Distance:", self.accelDistance, self.units
-
+			print
 			print "Constant Vel Duration:", self.constVelDuration, "seconds"
 			print "Decel Start Time:", self.decelStartTime, "seconds"
+			print
+			print "Decel Duration:", self.decelDuration, "seconds"
+			print "Decel Distance:", self.decelDistance, self.units
 
 		return "OK"
 
