@@ -27,6 +27,7 @@ class Axis:
 		#
 		self.lastPosition = 0
 		self.currentPosition = 0
+		self.currentDisplacement = 0
 		self.targetPosition = 0
 		self.direction = 0
 		# Move info
@@ -137,6 +138,8 @@ class Axis:
 			# should stuff be reset here?
 			pass
 		else:
+			moveFlag = True
+
 			# axis is moving
 			currentTime = datetime.datetime.now()
 
@@ -145,30 +148,39 @@ class Axis:
 			movingTimeSeconds = movingTimeDelta.total_seconds()
 
 			# This only works (badly) for moves in the positive direction.  There is still overshoot
-			self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds
+			#!self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds
+			self.currentDisplacement = self.baseVelocity * movingTimeSeconds
 			### calculate current position
 			if movingTimeSeconds < self.accelDuration:
 				# accelerating
-				self.currentPosition += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
+				self.currentDisplacement += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
 			else:
 				# past the point of accelerating
-				self.currentPosition += 0.5 * self.velocity * self.accelDuration
+				self.currentDisplacement += 0.5 * self.velocity * self.accelDuration
 
 				if movingTimeSeconds < self.decelStartTime:
 					# moving with constant speed
-					self.currentPosition += self.velocity * (movingTimeSeconds - self.accelDuration)
+					self.currentDisplacement += self.velocity * (movingTimeSeconds - self.accelDuration)
 				else:
 					# past the point of moving with constant speed
-					self.currentPosition += self.velocity * self.constVelDuration
+					self.currentDisplacement += self.velocity * self.constVelDuration
 
 					if movingTimeSeconds < self.totalMoveDuration:
 						# decelerating
-						self.currentPosition += (self.velocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
+						self.currentDisplacement += (self.velocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
 					else:
 						# move is done
-						self.currentPosition = self.targetPosition
-						self.lastPosition = self.targetPosition
-						self.moveStartTime = None
+						moveFlag = False
+
+			if moveFlag == True:
+				if self.direction == 1:
+					self.currentPosition = self.lastPosition + self.currentDisplacement
+				else:
+					self.currentPosition = self.lastPosition - self.currentDisplacement
+			else:
+				self.currentPosition = self.targetPosition
+				self.lastPosition = self.targetPosition
+				self.moveStartTime = None
 
 		return int(round(self.currentPosition))
 
