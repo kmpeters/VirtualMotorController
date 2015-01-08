@@ -2,6 +2,7 @@
 
 import status
 import datetime
+import math
 
 class Axis:
 	'''
@@ -30,6 +31,7 @@ class Axis:
 		self.currentDisplacement = 0
 		self.targetPosition = 0
 		self.direction = 0
+		self.moveVelocity = self.velocity
 		# Move info
 		self.accelDuration = 0.0
 		self.accelDistance = 0
@@ -73,18 +75,32 @@ class Axis:
 				# Move is positive
 				self.direction = 1
 			
-			## handle small moves here?
-
 			# Calculate values needed for readback position calculation
+			self.moveDistance = abs(self.targetPosition - self.lastPosition)
+
 			self.accelDuration = (self.velocity - self.baseVelocity) / self.acceleration
 			self.accelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.accelDuration + self.baseVelocity * self.accelDuration
 
 			self.decelDuration = (self.velocity - self.baseVelocity) / self.deceleration
 			self.decelDistance = 0.5 * (self.velocity - self.baseVelocity) * self.decelDuration + self.baseVelocity * self.decelDuration
 
-			self.moveDistance = abs(self.targetPosition - self.lastPosition)
+			if self.moveDistance < (self.accelDistance + self.decelDistance):
+				# Desired speed is never reached
+				peakVelocity = math.sqrt( 2 * self.acceleration * self.deceleration * self.moveDistance / (self.acceleration + self.deceleration) )
+				print "peakVelocity =", peakVelocity
+				self.moveVelocity = peakVelocity
 
-			self.constVelDuration = (self.moveDistance - self.accelDistance - self.decelDistance) / self.velocity
+				# Recalculate values
+				self.accelDuration = peakVelocity / self.acceleration
+				self.accelDistance = 0.5 * peakVelocity * self.accelDuration
+
+				self.decelDuration = peakVelocity / self.deceleration
+				self.decelDistance = 0.5 * peakVelocity * self.decelDuration
+
+				self.constVelDuration = 0.0
+			else:
+				self.moveVelocity = self.velocity
+				self.constVelDuration = (self.moveDistance - self.accelDistance - self.decelDistance) / self.velocity
 
 			self.decelStartTime = self.accelDuration + self.constVelDuration
 			self.totalMoveDuration = self.decelStartTime + self.decelDuration
@@ -147,27 +163,25 @@ class Axis:
 			movingTimeDelta = currentTime - self.moveStartTime
 			movingTimeSeconds = movingTimeDelta.total_seconds()
 
-			# This only works (badly) for moves in the positive direction.  There is still overshoot
-			#!self.currentPosition = self.lastPosition + self.baseVelocity * movingTimeSeconds
-			self.currentDisplacement = self.baseVelocity * movingTimeSeconds
 			### calculate current position
+			self.currentDisplacement = self.baseVelocity * movingTimeSeconds
 			if movingTimeSeconds < self.accelDuration:
 				# accelerating
 				self.currentDisplacement += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
 			else:
 				# past the point of accelerating
-				self.currentDisplacement += 0.5 * self.velocity * self.accelDuration
+				self.currentDisplacement += 0.5 * self.moveVelocity * self.accelDuration
 
 				if movingTimeSeconds < self.decelStartTime:
-					# moving with constant speed
-					self.currentDisplacement += self.velocity * (movingTimeSeconds - self.accelDuration)
+					# moving with constant speed, will never be true for short moves
+					self.currentDisplacement += self.moveVelocity * (movingTimeSeconds - self.accelDuration)
 				else:
-					# past the point of moving with constant speed
-					self.currentDisplacement += self.velocity * self.constVelDuration
+					# past the point of moving with constant speed, constant speed component will be zero for short moves
+					self.currentDisplacement += self.moveVelocity * self.constVelDuration
 
 					if movingTimeSeconds < self.totalMoveDuration:
 						# decelerating
-						self.currentDisplacement += (self.velocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
+						self.currentDisplacement += (self.moveVelocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
 					else:
 						# move is done
 						moveFlag = False
