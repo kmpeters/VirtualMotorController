@@ -40,7 +40,7 @@ class Axis:
 		self.moveDistance = 0
 		self.constVelDuration = 0.0
 		self.decelStartTime = 0.0
-		self.totalMoveDuration = 0.0
+		self.moveDuration = 0.0
 		#
 		self.enforceLimits = False
 		#
@@ -94,8 +94,8 @@ class Axis:
 				self.accelDuration = peakVelocity / self.acceleration
 				self.accelDistance = 0.5 * peakVelocity * self.accelDuration
 
-				self.decelDuration = peakVelocity / self.deceleration
-				self.decelDistance = 0.5 * peakVelocity * self.decelDuration
+				self.decelDuration = (peakVelocity - self.baseVelocity) / self.deceleration
+				self.decelDistance = 0.5 * (peakVelocity - self.baseVelocity) * self.decelDuration + self.baseVelocity * self.decelDuration
 
 				self.constVelDuration = 0.0
 			else:
@@ -103,12 +103,12 @@ class Axis:
 				self.constVelDuration = (self.moveDistance - self.accelDistance - self.decelDistance) / self.velocity
 
 			self.decelStartTime = self.accelDuration + self.constVelDuration
-			self.totalMoveDuration = self.decelStartTime + self.decelDuration
+			self.moveDuration = self.decelStartTime + self.decelDuration
 
 			print "Start Pos:", self.lastPosition, self.units
 			print "End Pos:", self.targetPosition, self.units
 			print "Move Distance:", self.moveDistance, self.units
-			print "Move Duration:", self.totalMoveDuration, "seconds"
+			print "Move Duration:", self.moveDuration, "seconds"
 			print
 			print "Accel Duration:", self.accelDuration, "seconds"
 			print "Accel Distance:", self.accelDistance, self.units
@@ -131,21 +131,44 @@ class Axis:
 				pass
 			else:
 				# motor is moving, this is the first stop request
-				#!self.abortTime = datetime.datetime.now()
-				#!abortTimeDelta = self.abortTime - self.moveStartTime
-				#!abortTimeSeconds = abortTimeDelta.total_seconds()
+				self.abortTime = datetime.datetime.now()
+				abortTimeDelta = self.abortTime - self.moveStartTime
+				abortTimeSeconds = abortTimeDelta.total_seconds()
 
 				# Recalculate the motion profile
-				#!if abortTimeSeconds < self.accelDuration:
+				if abortTimeSeconds < self.accelDuration:
 					# stop received while accelerating
-				#!	self.accelDuration = abortTimeSeconds
-				#!	self.accelDistance = 0.5 * self.acceleration * abortTimeSeconds ** 2 + self.baseVelocity * abortTimeSeconds
+					self.accelDuration = abortTimeSeconds
+					self.accelDistance = 0.5 * self.acceleration * abortTimeSeconds ** 2 + self.baseVelocity * abortTimeSeconds
 
-				#!	self.constVelDuration = 0.0
+					peakVelocity = self.acceleration * abortTimeSeconds + self.baseVelocity
 
-				#!	self.decelStartTime = abortTimeSeconds
-				#!	self.decelDistance =  
-				pass
+					self.constVelDuration = 0.0
+
+					self.decelStartTime = abortTimeSeconds
+
+					self.decelDuration = (peakVelocity - self.baseVelocity) / self.deceleration
+					self.decelDistance = 0.5 * (peakVelocity - self.baseVelocity) * self.decelDuration + self.baseVelocity * self.decelDuration
+
+					self.moveDistance = self.accelDistance + self.decelDistance
+					self.moveDuration = self.accelDuration + self.decelDuration
+
+					self.moveVelocity = peakVelocity
+				elif abortTimeSeconds < decelStartTime:
+					# stop received while moving with constant velocity
+					self.decelStartTime = abortTimeSeconds
+
+					self.constVelDuration = abortTimeSeconds - self.accelDuration
+
+					self.moveDistance = self.accelDistance + self.moveVelocity * self.constVelDuration + self.decelDistance
+					self.moveDuration = self.accelDuration + self.constVelDuration + self.decelDuration
+
+				elif abortTimeSeconds < self.moveDuration:
+					# stop received while decelerating, do nothing
+					pass
+				else:
+					print "Error: Stop received after a move should have been complete."
+
 		return "OK"
 
 	def readPosition(self):
@@ -179,7 +202,7 @@ class Axis:
 					# past the point of moving with constant speed, constant speed component will be zero for short moves
 					self.currentDisplacement += self.moveVelocity * self.constVelDuration
 
-					if movingTimeSeconds < self.totalMoveDuration:
+					if movingTimeSeconds < self.moveDuration:
 						# decelerating
 						self.currentDisplacement += (self.moveVelocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
 					else:
@@ -215,7 +238,7 @@ class Axis:
 			movingTimeDelta = currentTime - self.moveStartTime
 			movingTimeSeconds = movingTimeDelta.total_seconds()
 
-			if movingTimeSeconds < self.totalMoveDuration:
+			if movingTimeSeconds < self.moveDuration:
 				# move is in progress
 				self.status.setMoving()
 			else:
