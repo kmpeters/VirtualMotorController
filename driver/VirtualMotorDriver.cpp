@@ -258,17 +258,16 @@ asynStatus VirtualMotorAxis::stop(double acceleration )
 }
 
 
-/*
 asynStatus VirtualMotorAxis::setPosition(double position)
 {
   asynStatus status;
   //static const char *functionName = "VirtualMotorAxis::setPosition";
 
-  sprintf(pC_->outString_, "%d HO %d", axisIndex_, NINT(position));
+  sprintf(pC_->outString_, "%d POS %d", axisIndex_, NINT(position));
   status = pC_->writeController();
   return status;
 }
-*/
+
 
 /*
 asynStatus VirtualMotorAxis::setClosedLoop(bool closedLoop)

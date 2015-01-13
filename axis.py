@@ -56,7 +56,7 @@ class Axis:
 		else:
 			#
 			self.moveStartTime = datetime.datetime.now()
-			self.targetPosition = int(round(targetPosition))
+			self.targetPosition = targetPosition
 			
 			# |
 			# |
@@ -220,10 +220,17 @@ class Axis:
 				self.lastPosition = self.currentPosition
 				self.moveStartTime = None
 
-		return int(round(self.currentPosition))
+		return self.currentPosition
 
-	def setPosition(self):
-		return
+	def setPosition(self, newPosition):
+		if self.moveStartTime == None:
+			# Axis isn't moving, redefine the position
+			self.currentPosition = newPosition
+			self.lastPosition = self.currentPosition
+		else:
+			# Move is in progress, do nothing
+			pass
+		return "OK"
 
 	# Does it make more sense to have an updateController() method that is called before each readStatus and readPosition call?
 
@@ -267,13 +274,13 @@ class Axis:
 		return self.highLimit
 
 	def setHighLimit(self, highLimit):
-		self.highLimit = int(round(highLimit))
+		self.highLimit = highLimit
 		return "OK"
 
 	def readLowLimit(self):
 		return self.lowLimit
 
 	def setLowLimit(self, lowLimit):
-		self.lowLimit = int(round(lowLimit))
+		self.lowLimit = lowLimit
 		return  "OK"
 
