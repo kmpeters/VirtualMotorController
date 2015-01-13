@@ -21,14 +21,14 @@ class Controller:
 		                       'ACC':self.setAcceleration, 
 				       'VEL':self.setVelocity,
 				       'LL':self.setLowLimit,
-				       'HL':self.setHighLimit,
-				       'AB':self.stopAxis},
+				       'HL':self.setHighLimit},
 		                    2:{'POS?':self.queryPosition, 
 				       'ST?':self.queryStatus,
 				       'ACC?':self.queryAcceleration,
 				       'VEL?':self.queryVelocity,
 				       'LL?':self.queryLowLimit,
-				       'HL?':self.queryHighLimit}} 
+				       'HL?':self.queryHighLimit,
+				       'AB':self.stopAxis}} 
 		self.axisDict = {}
 		self.axisList = []
 		self.enforceLimits = False

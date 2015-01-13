@@ -173,6 +173,7 @@ void VirtualMotorAxis::report(FILE *fp, int level)
   asynMotorAxis::report(fp, level);
 }
 
+
 asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double velocity) 
 {
   asynStatus status;
@@ -245,7 +246,7 @@ asynStatus VirtualMotorAxis::moveVelocity(double minVelocity, double maxVelocity
 }
 */
 
-/*
+
 asynStatus VirtualMotorAxis::stop(double acceleration )
 {
   asynStatus status;
@@ -255,7 +256,7 @@ asynStatus VirtualMotorAxis::stop(double acceleration )
   status = pC_->writeController();
   return status;
 }
-*/
+
 
 /*
 asynStatus VirtualMotorAxis::setPosition(double position)

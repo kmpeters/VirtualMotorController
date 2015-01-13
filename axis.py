@@ -70,7 +70,7 @@ class Axis:
 			# Calculate direction
 			if self.targetPosition < self.lastPosition:
 				# Move is negative
-				self.direction = 0
+				self.direction = -1
 			else:
 				# Move is positive
 				self.direction = 1
@@ -154,7 +154,7 @@ class Axis:
 					self.moveDuration = self.accelDuration + self.decelDuration
 
 					self.moveVelocity = peakVelocity
-				elif abortTimeSeconds < decelStartTime:
+				elif abortTimeSeconds < self.decelStartTime:
 					# stop received while moving with constant velocity
 					self.decelStartTime = abortTimeSeconds
 
@@ -210,13 +210,14 @@ class Axis:
 						moveFlag = False
 
 			if moveFlag == True:
-				if self.direction == 1:
-					self.currentPosition = self.lastPosition + self.currentDisplacement
-				else:
-					self.currentPosition = self.lastPosition - self.currentDisplacement
+				self.currentPosition = self.lastPosition + self.direction * self.currentDisplacement
 			else:
-				self.currentPosition = self.targetPosition
-				self.lastPosition = self.targetPosition
+				if self.abortTime == None:
+					self.currentPosition = self.targetPosition
+				else:
+					self.currentPosition = self.lastPosition + self.direction * self.moveDistance
+					self.abortTime = None
+				self.lastPosition = self.currentPosition
 				self.moveStartTime = None
 
 		return int(round(self.currentPosition))
