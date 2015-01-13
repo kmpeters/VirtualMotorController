@@ -3,9 +3,14 @@
 import axis
 import time
 
+import os
+import sys
+import getopt
 import asynchat
 import asyncore
 import socket
+
+DEFAULT_PORT = 31337
 
 class Controller:
 	'''
@@ -157,18 +162,63 @@ class ConnectionHandler(asynchat.async_chat):
 		data = response + self.outputTerminator
 		self.push(data)
 
-if __name__ == '__main__':
-	#!myc = Controller()
-	#!pos = myc.axisList[0].readPosition()
-	#!st = myc.axisList[0].readStatus()
-	#!print st, pos
-	#!myc.axisList[0].move(5.0)
-	#!for i in range(65):
-	#!	pos = myc.axisList[0].readPosition()
-	#!	st = myc.axisList[0].readStatus()
-	#!	print st, pos
-	#!	time.sleep(0.1)
-	port = 31337
 
+def getProgramName(args=None):
+	if args == None:
+		args = sys.argv
+	if len(args) == 0 or args[0] == "-c":
+		return "PROGRAM_NAME"
+	return os.path.basename(args[0])
+
+
+def printUsage():
+	print """\
+Usage: %s [-ph]
+
+Options:
+  -p,--port=NUMBER   Listen on the specified port NUMBER for incoming
+                     connections (default: %d)
+  -h,--help          Print usage message and exit\
+""" % (getProgramName(), DEFAULT_PORT)
+
+
+def parseCommandLineArgs(args):
+	(options, extra) = getopt.getopt(args[1:], "p:h", ["port=", "help"])
+
+	port = DEFAULT_PORT
+
+	for eachOptName, eachOptValue in options:
+		if eachOptName in ("-p", "--port"):
+			port = int(eachOptValue)
+		elif eachOptName in ("-h", "--help"):
+			printUsage()
+			sys.exit(0)
+
+	if len(extra) > 0:
+		print "Error: unexpected command-line argument \"%s\"" % extra[0]
+		printUsage()
+		sys.exit(1)
+
+	return port
+
+
+def main(args):
+	port = parseCommandLineArgs(args)
 	server = ConnectionDispatcher(port)
-	asyncore.loop()
+	try:
+		asyncore.loop()
+	except KeyboardInterrupt:
+		print
+		print "Shutting down server..."
+		sys.exit(0)
+
+
+if __name__ == '__main__':
+	try:
+		main(sys.argv)
+	except Exception, e:
+		if isinstance(e, SystemExit):
+			raise e
+		else:
+			print "Error: %s" % e
+			sys.exit(1)
