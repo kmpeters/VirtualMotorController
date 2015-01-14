@@ -139,7 +139,12 @@ class Axis:
 
 	def jog(self, velocity):
 		print "velocity", velocity
-		return "OK"
+
+		# Simulate jogging by issuing an hour-long move
+		displacement = velocity * 3600.0
+		retval = self.moveRelative(displacement)
+
+		return retval
 
 
 	def stop(self):
@@ -277,7 +282,8 @@ class Axis:
 		return self.status.doneMoving
 
 	def setVelocity(self, velocity):
-		self.velocity = velocity
+		# velocity is negative when jogging, but all position calculations require positive velocities
+		self.velocity = abs(velocity)
 		return "OK"
 
 	def readVelocity(self):

@@ -15,6 +15,7 @@ class Controller:
 
 		self.commandDict = {3:{'MV':self.moveAxis,
 		                       'MR':self.moveRelative,
+		                       'JOG':self.jog,
 		                       'POS':self.setPosition,
 		                       'ACC':self.setAcceleration, 
 				       'VEL':self.setVelocity,
@@ -90,6 +91,9 @@ class Controller:
 
 	def moveRelative(self, axis, pos):
 		return self.axisList[self.axisDict[axis]].moveRelative(int(pos))
+
+	def jog(self, axis, velocity):
+		return self.axisList[self.axisDict[axis]].jog(float(velocity))
 
 	def stopAxis(self, axis):
 		return self.axisList[self.axisDict[axis]].stop()
