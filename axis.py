@@ -75,9 +75,11 @@ class Axis:
 			if self.targetPosition < self.lastPosition:
 				# Move is negative
 				self.direction = -1
+				self.status.setDirNegative()
 			else:
 				# Move is positive
 				self.direction = 1
+				self.status.setDirPositive()
 			
 			# Calculate values needed for readback position calculation
 			self.moveDistance = abs(self.targetPosition - self.lastPosition)
@@ -279,7 +281,7 @@ class Axis:
 				# move is done but neither position or status have been updated
 				self.status.setDoneMoving()
 
-		return self.status.doneMoving
+		return self.status.getStatus()
 
 	def setVelocity(self, velocity):
 		# velocity is negative when jogging, but all position calculations require positive velocities

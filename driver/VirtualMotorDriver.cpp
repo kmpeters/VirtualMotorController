@@ -296,9 +296,11 @@ asynStatus VirtualMotorAxis::setClosedLoop(bool closedLoop)
   * \param[out] moving A flag that is set indicating that the axis is moving (true) or done (false). */
 asynStatus VirtualMotorAxis::poll(bool *moving)
 { 
-  int done;
   int position;
   int status;
+  int done;
+  int direction;
+  int limit;
   asynStatus comStatus;
 
   // Read the current motor position
@@ -320,17 +322,21 @@ asynStatus VirtualMotorAxis::poll(bool *moving)
 
   // Set the direction bit in the move method instead of here since there isn't a direction bit, requires private readback position var
   // Or set the direction bit here, requires a private target position var
+  direction = (status & 0x1) ? 1 : 0;
+  setIntegerParam(pC_->motorStatusDirection_, direction);
 
-  done = (status & 0x1) ? 1 : 0;
+  done = (status & 0x2) ? 1 : 0;
   setIntegerParam(pC_->motorStatusDone_, done);
+  setIntegerParam(pC_->motorStatusMoving_, !done);
   *moving = done ? false:true;
 
   // Read the limit status
-  //limit = (status & 0x2000) ? 1 : 0;
-  //setIntegerParam(pC_->motorStatusHighLimit_, limit);
-  //limit = (status & 0x8000) ? 1 : 0;
-  //setIntegerParam(pC_->motorStatusLowLimit_, limit);
-  // VirtualMotor doesn't have a home status bit
+  limit = (status & 0x8) ? 1 : 0;
+  setIntegerParam(pC_->motorStatusHighLimit_, limit);
+  limit = (status & 0x10) ? 1 : 0;
+  setIntegerParam(pC_->motorStatusLowLimit_, limit);
+
+  // Read the home status--eventually
   
   // Read the drive power on status
   //driveOn = (status & 0x100) ? 0 : 1;
