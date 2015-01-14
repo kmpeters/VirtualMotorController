@@ -216,23 +216,24 @@ class Axis:
 
 			### calculate current position
 			self.currentDisplacement = self.baseVelocity * movingTimeSeconds
+
 			if movingTimeSeconds < self.accelDuration:
 				# accelerating
 				self.currentDisplacement += 0.5 * self.acceleration * movingTimeSeconds * movingTimeSeconds
 			else:
 				# past the point of accelerating
-				self.currentDisplacement += 0.5 * self.moveVelocity * self.accelDuration
+				self.currentDisplacement += 0.5 * (self.moveVelocity - self.baseVelocity) * self.accelDuration
 
 				if movingTimeSeconds < self.decelStartTime:
 					# moving with constant speed, will never be true for short moves
-					self.currentDisplacement += self.moveVelocity * (movingTimeSeconds - self.accelDuration)
+					self.currentDisplacement += (self.moveVelocity - self.baseVelocity) * (movingTimeSeconds - self.accelDuration)
 				else:
 					# past the point of moving with constant speed, constant speed component will be zero for short moves
-					self.currentDisplacement += self.moveVelocity * self.constVelDuration
+					self.currentDisplacement += (self.moveVelocity - self.baseVelocity) * self.constVelDuration
 
 					if movingTimeSeconds < self.moveDuration:
 						# decelerating
-						self.currentDisplacement += (self.moveVelocity - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
+						self.currentDisplacement += ((self.moveVelocity - self.baseVelocity) - 0.5 * self.deceleration * (movingTimeSeconds - self.decelStartTime)) * (movingTimeSeconds - self.decelStartTime)
 					else:
 						# move is done
 						moveFlag = False
@@ -247,17 +248,18 @@ class Axis:
 					self.abortTime = None
 				self.lastPosition = self.currentPosition
 				self.moveStartTime = None
-		#
-		if (self.direction == 1 and self.currentPosition > self.targetPosition) or (self.direction == -1 and self.currentPosition < self.targetPosition):
-			print
-			print "Overshoot"
-			print
-			print "direction", self.direction
-			print "current pos", self.currentPosition
-			print "target pos", self.targetPosition
-			print 
-			print "elapsed time", movingTimeSeconds
-			print "expected time", self.moveDuration
+		
+		# tdir/overshoot debugging
+		#!if (self.direction == 1 and self.currentPosition > self.targetPosition) or (self.direction == -1 and self.currentPosition < self.targetPosition):
+		#!	print
+		#!	print "Overshoot"
+		#!	print
+		#!	print "direction", self.direction
+		#!	print "current pos", self.currentPosition
+		#!	print "target pos", self.targetPosition
+		#!	print 
+		#!	print "elapsed time", movingTimeSeconds
+		#!	print "expected time", self.moveDuration
 
 		return self.currentPosition
 
