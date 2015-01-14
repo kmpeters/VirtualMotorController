@@ -47,6 +47,10 @@ class Axis:
 		self.status = status.Status()
 	
 	def move(self, targetPosition):
+		if self.moveStartTime != None:
+			# Ignore moves while a move is in progress
+			return "Busy"
+
 		self.lastPosition = self.currentPosition
 		# how to detect if controller has limits enabled?
 		if (self.enforceLimits == True) and (targetPosition > self.highLimit):
@@ -120,6 +124,18 @@ class Axis:
 			print "Decel Distance:", self.decelDistance, self.units
 
 		return "OK"
+
+
+	def moveRelative(self, displacement):
+		if self.moveStartTime != None:
+			# Ignore moves while a move is in progress
+			return "Busy"
+
+		targetPosition = self.lastPosition + displacement
+		retval = self.move(targetPosition)
+
+		return retval
+
 
 	def stop(self):
 		if self.moveStartTime == None:
