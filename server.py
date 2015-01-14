@@ -46,8 +46,11 @@ class ConnectionHandler(asynchat.async_chat):
 
 	def handleClientRequest(self, request):
 		request = request.strip()
+
 		## handle actual commands here
-		print request
+
+		# Display received commands
+		#!print request
 
 		# Commands of form
 		# X MV 400

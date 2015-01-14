@@ -93,6 +93,7 @@ class Axis:
 			if self.moveDistance < (self.accelDistance + self.decelDistance):
 				# Desired speed is never reached
 				peakVelocity = math.sqrt( 2 * self.acceleration * self.deceleration * self.moveDistance / (self.acceleration + self.deceleration) )
+				print "+---------"
 				print "peakVelocity =", peakVelocity
 				self.moveVelocity = peakVelocity
 
@@ -111,6 +112,7 @@ class Axis:
 			self.decelStartTime = self.accelDuration + self.constVelDuration
 			self.moveDuration = self.decelStartTime + self.decelDuration
 
+			print "+---------"
 			print "Start Pos:", self.lastPosition, self.units
 			print "End Pos:", self.targetPosition, self.units
 			print "Move Distance:", self.moveDistance, self.units
@@ -124,6 +126,7 @@ class Axis:
 			print
 			print "Decel Duration:", self.decelDuration, "seconds"
 			print "Decel Distance:", self.decelDistance, self.units
+			print
 
 		return "OK"
 
@@ -140,7 +143,7 @@ class Axis:
 
 
 	def jog(self, velocity):
-		print "velocity", velocity
+		#!print "velocity", velocity
 
 		# Simulate jogging by issuing an hour-long move
 		displacement = velocity * 3600.0
