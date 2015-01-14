@@ -9,7 +9,8 @@ class Axis:
 	Class representing a motor axis
 
 	'''
-	def __init__(self):
+	def __init__(self, index):
+		self.index = index
 		# units / second
 		self.velocity = 400
 		self.baseVelocity = 0
@@ -112,7 +113,7 @@ class Axis:
 			self.decelStartTime = self.accelDuration + self.constVelDuration
 			self.moveDuration = self.decelStartTime + self.decelDuration
 
-			print "+---------"
+			print "+--------- motor", (self.index + 1)
 			print "Start Pos:", self.lastPosition, self.units
 			print "End Pos:", self.targetPosition, self.units
 			print "Move Distance:", self.moveDistance, self.units

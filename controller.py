@@ -34,7 +34,7 @@ class Controller:
 		self.enforceLimits = False
 
 		for i in range(self.numAxes):
-			self.axisList.append( axis.Axis() )
+			self.axisList.append( axis.Axis(i) )
 			self.axisDict[self.axisNameList[i]] = i
 			self.axisDict[self.axisNumberList[i]] = i
 
