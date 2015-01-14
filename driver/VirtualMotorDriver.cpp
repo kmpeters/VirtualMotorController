@@ -181,15 +181,15 @@ asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double ve
 
   // Send the base velocity
   sprintf(pC_->outString_, "%d BAS %f", axisIndex_, baseVelocity);
-  status = pC_->writeController();
+  status = pC_->writeReadController();
 
   // Send the velocity
   sprintf(pC_->outString_, "%d VEL %f", axisIndex_, velocity);
-  status = pC_->writeController();
+  status = pC_->writeReadController();
 
   // Send the acceleration
   sprintf(pC_->outString_, "%d ACC %f", axisIndex_, acceleration);
-  status = pC_->writeController();
+  status = pC_->writeReadController();
 
   return status;
 }
@@ -208,7 +208,7 @@ asynStatus VirtualMotorAxis::move(double position, int relative, double minVeloc
   } else {
     sprintf(pC_->outString_, "%d MV %d", axisIndex_, NINT(position));
   }
-  status = pC_->writeController();
+  status = pC_->writeReadController();
 
   // If controller has a "go" command, send it here
   
@@ -236,7 +236,7 @@ asynStatus VirtualMotorAxis::moveVelocity(double minVelocity, double maxVelocity
   status = sendAccelAndVelocity(acceleration, maxVelocity, minVelocity);
 
   sprintf(pC_->outString_, "%d JOG %f", axisIndex_, maxVelocity);
-  status = pC_->writeController();
+  status = pC_->writeReadController();
   return status;
 }
 
@@ -247,7 +247,7 @@ asynStatus VirtualMotorAxis::stop(double acceleration )
   //static const char *functionName = "VirtualMotorAxis::stop";
 
   sprintf(pC_->outString_, "%d AB", axisIndex_);
-  status = pC_->writeController();
+  status = pC_->writeReadController();
   return status;
 }
 
@@ -258,7 +258,7 @@ asynStatus VirtualMotorAxis::setPosition(double position)
   //static const char *functionName = "VirtualMotorAxis::setPosition";
 
   sprintf(pC_->outString_, "%d POS %d", axisIndex_, NINT(position));
-  status = pC_->writeController();
+  status = pC_->writeReadController();
   return status;
 }
 
