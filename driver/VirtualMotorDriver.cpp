@@ -132,8 +132,8 @@ VirtualMotorAxis::VirtualMotorAxis(VirtualMotorController *pC, int axisNo)
   axisIndex_ = axisNo + 1;
 
   // Allow CNEN to turn motor power on/off
-  setIntegerParam(pC->motorStatusGainSupport_, 1);
-  setIntegerParam(pC->motorStatusHasEncoder_, 1);
+  //setIntegerParam(pC->motorStatusGainSupport_, 1);
+  //setIntegerParam(pC->motorStatusHasEncoder_, 1);
 
 }
 
@@ -341,7 +341,6 @@ asynStatus VirtualMotorAxis::poll(bool *moving)
   // Read the drive power on status
   //driveOn = (status & 0x100) ? 0 : 1;
   //setIntegerParam(pC_->motorStatusPowerOn_, driveOn);
-  //setIntegerParam(pC_->motorStatusProblem_, 0);
 
   skip:
   setIntegerParam(pC_->motorStatusProblem_, comStatus ? 1:0);
