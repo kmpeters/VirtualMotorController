@@ -23,7 +23,7 @@ public:
   VirtualMotorAxis(class VirtualMotorController *pC, int axisNo);
   void report(FILE *fp, int level);
   asynStatus move(double position, int relative, double min_velocity, double max_velocity, double acceleration);
-  //asynStatus moveVelocity(double min_velocity, double max_velocity, double acceleration);
+  asynStatus moveVelocity(double min_velocity, double max_velocity, double acceleration);
   //asynStatus home(double min_velocity, double max_velocity, double acceleration, int forwards);
   asynStatus stop(double acceleration);
   asynStatus poll(bool *moving);
@@ -35,7 +35,7 @@ private:
                                    *   Abbreviated because it is used very frequently */
   int axisIndex_;
   //double stepsPerRev_;
-  asynStatus sendAccelAndVelocity(double accel, double velocity);
+  asynStatus sendAccelAndVelocity(double accel, double velocity, double baseVelocity);
   
 friend class VirtualMotorController;
 };

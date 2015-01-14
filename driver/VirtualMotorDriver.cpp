@@ -174,10 +174,14 @@ void VirtualMotorAxis::report(FILE *fp, int level)
 }
 
 
-asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double velocity) 
+asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double velocity, double baseVelocity) 
 {
   asynStatus status;
   // static const char *functionName = "VirtualMotor::sendAccelAndVelocity";
+
+  // Send the base velocity
+  sprintf(pC_->outString_, "%d BAS %f", axisIndex_, baseVelocity);
+  status = pC_->writeController();
 
   // Send the velocity
   sprintf(pC_->outString_, "%d VEL %f", axisIndex_, velocity);
@@ -196,7 +200,7 @@ asynStatus VirtualMotorAxis::move(double position, int relative, double minVeloc
   asynStatus status;
   // static const char *functionName = "VirtualMotorAxis::move";
 
-  status = sendAccelAndVelocity(acceleration, maxVelocity);
+  status = sendAccelAndVelocity(acceleration, maxVelocity, minVelocity);
   
   // Set the target position
   if (relative) {
@@ -216,35 +220,25 @@ asynStatus VirtualMotorAxis::home(double minVelocity, double maxVelocity, double
 {
   // static const char *functionName = "VirtualMotorAxis::home";
 
-  // Homing wasn't implemented in the original driver.  
-  // It could be implemented using the HA & HP commands.
+  // Homing isn't currently implemented
 
   return asynSuccess;
 }
 */
 
-/*
+
 asynStatus VirtualMotorAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
 {
   asynStatus status;
-  int sp;
-  static const char *functionName = "VirtualMotorAxis::moveVelocity";
+  //static const char *functionName = "VirtualMotorAxis::moveVelocity";
 
-  asynPrint(pasynUser_, ASYN_TRACE_FLOW,
-    "%s: minVelocity=%f, maxVelocity=%f, acceleration=%f\n",
-    functionName, minVelocity, maxVelocity, acceleration);
-    
   // Call this to set the max current and acceleration
-  status = sendAccelAndVelocity(acceleration, maxVelocity);
+  status = sendAccelAndVelocity(acceleration, maxVelocity, minVelocity);
 
-  // Calculate velocity
-  sp = NINT(samplePeriod_ * 6e-5 * maxVelocity);
-
-  sprintf(pC_->outString_, "%d V %d", axisIndex_, sp);
+  sprintf(pC_->outString_, "%d JOG %f", axisIndex_, maxVelocity);
   status = pC_->writeController();
   return status;
 }
-*/
 
 
 asynStatus VirtualMotorAxis::stop(double acceleration )

@@ -18,6 +18,7 @@ class Controller:
 		                       'POS':self.setPosition,
 		                       'ACC':self.setAcceleration, 
 				       'VEL':self.setVelocity,
+				       'BAS':self.setBaseVelocity,
 				       'LL':self.setLowLimit,
 				       'HL':self.setHighLimit},
 		                    2:{'POS?':self.queryPosition, 
@@ -38,10 +39,6 @@ class Controller:
 
 		#!print self.axisDict
 		#!print self.axisDict.keys()
-
-	def strToNum(self, inputString):
-		# Return an int since the controller has units of counts
-		return int(round(float(inputString)))
 
 	def refinePos(self, inputPos):
 		# Convert a raw position from the axis class to something suitable for output
@@ -71,7 +68,8 @@ class Controller:
 					if numArgs == 2:
 						retVal = self.commandDict[numArgs][args[1]](args[0])
 					elif numArgs == 3:
-						retVal = self.commandDict[numArgs][args[1]](args[0], self.strToNum(args[2]))
+						# Note: args[2] is a string
+						retVal = self.commandDict[numArgs][args[1]](args[0], args[2])
 					else:
 						retVal = "Strange error"
 
@@ -82,28 +80,34 @@ class Controller:
 		return self.refinePos(self.axisList[self.axisDict[axis]].readPosition())
 
 	def setPosition(self, axis, pos):
-		return self.axisList[self.axisDict[axis]].setPosition(pos)
+		return self.axisList[self.axisDict[axis]].setPosition(int(pos))
 
 	def queryStatus(self, axis):
 		return self.axisList[self.axisDict[axis]].readStatus()
 
 	def moveAxis(self, axis, pos):
-		return self.axisList[self.axisDict[axis]].move(pos)
+		return self.axisList[self.axisDict[axis]].move(int(pos))
 
 	def moveRelative(self, axis, pos):
-		return self.axisList[self.axisDict[axis]].moveRelative(pos)
+		return self.axisList[self.axisDict[axis]].moveRelative(int(pos))
 
 	def stopAxis(self, axis):
 		return self.axisList[self.axisDict[axis]].stop()
 
 	def setVelocity(self, axis, velocity):
-		return self.axisList[self.axisDict[axis]].setVelocity(velocity)
+		return self.axisList[self.axisDict[axis]].setVelocity(float(velocity))
 
 	def queryVelocity(self, axis):
 		return self.axisList[self.axisDict[axis]].readVelocity()
 
+	def setBaseVelocity(self, axis, velocity):
+		return self.axisList[self.axisDict[axis]].setBaseVelocity(float(velocity))
+
+	def queryBaseVelocity(self, axis):
+		return self.axisList[self.axisDict[axis]].readBaseVelocity()
+
 	def setAcceleration(self, axis, acceleration):
-		return self.axisList[self.axisDict[axis]].setAcceleration(acceleration)
+		return self.axisList[self.axisDict[axis]].setAcceleration(float(acceleration))
 
 	def queryAcceleration(self, axis):
 		return self.axisList[self.axisDict[axis]].readAcceleration()
@@ -112,11 +116,11 @@ class Controller:
 		return self.axisList[self.axisDict[axis]].readHighLimit()
 
 	def setHighLimit(self, axis, highLimit):
-		return self.axisList[self.axisDict[axis]].setHighLimit(highLimit)
+		return self.axisList[self.axisDict[axis]].setHighLimit(int(highLimit))
 
 	def queryLowLimit(self, axis):
 		return self.axisList[self.axisDict[axis]].readLowLimit()
 
 	def setLowLimit(self, axis, lowLimit):
-		return  self.axisList[self.axisDict[axis]].setLowLimit(lowLimit)
+		return  self.axisList[self.axisDict[axis]].setLowLimit(int(lowLimit))
 

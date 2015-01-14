@@ -30,7 +30,7 @@ class Axis:
 		self.currentPosition = 0
 		self.currentDisplacement = 0
 		self.targetPosition = 0
-		self.direction = 0
+		self.direction = 1
 		self.moveVelocity = self.velocity
 		# Move info
 		self.accelDuration = 0.0
@@ -135,6 +135,11 @@ class Axis:
 		retval = self.move(targetPosition)
 
 		return retval
+
+
+	def jog(self, velocity):
+		print "velocity", velocity
+		return "OK"
 
 
 	def stop(self):
@@ -277,6 +282,13 @@ class Axis:
 
 	def readVelocity(self):
 		return self.velocity
+
+	def setBaseVelocity(self, velocity):
+		self.baseVelocity = velocity
+		return "OK"
+
+	def readBaseVelocity(self):
+		return self.baseVelocity
 
 	def setAcceleration(self, acceleration):
 		self.acceleration = acceleration
