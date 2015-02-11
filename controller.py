@@ -9,8 +9,8 @@ class Controller:
 
 	'''
 	def __init__(self):
-		self.numAxes = 3
-		self.axisNameList = ['X','Y','Z']
+		self.numAxes = 8
+		self.axisNameList = ['X','Y','Z','T','U','V','R','S']
 		self.axisNumberList = [str(x) for x in range(1, self.numAxes+1)]
 
 		self.commandDict = {3:{'MV':self.moveAxis,
