@@ -3,3 +3,7 @@
 *.pyc
 examples
 .svn
+setup.py*
+server-mac*
+build
+dist
