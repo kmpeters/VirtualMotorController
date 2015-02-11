@@ -173,7 +173,14 @@ void VirtualMotorAxis::report(FILE *fp, int level)
   asynMotorAxis::report(fp, level);
 }
 
-
+/*
+ * sendAccelAndVelocity is called by VirtualMotorAxis methods that result in the motor moving: move, moveVelocity, home
+ *
+ * Arguments in terms of motor record fields:
+ *     baseVelocity (steps/s) = VBAS / abs(MRES)
+ *     velocity (step/s) = VELO / abs(MRES)
+ *     acceleration (step/s/s) = (velocity - baseVelocity) / ACCL
+ */
 asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double velocity, double baseVelocity) 
 {
   asynStatus status;
@@ -195,6 +202,16 @@ asynStatus VirtualMotorAxis::sendAccelAndVelocity(double acceleration, double ve
 }
 
 
+/*
+ * move is called by asynMotor device support when an absolute or a relative move is requested.
+ * It can be called multiple times if BDST > 0 or RTRY > 0.
+ *
+ * Arguments in terms of motor record fields:
+ *     position (steps) = RVAL = DVAL / MRES
+ *     baseVelocity (steps/s) = VBAS / abs(MRES)
+ *     velocity (step/s) = VELO / abs(MRES)
+ *     acceleration (step/s/s) = (velocity - baseVelocity) / ACCL
+ */
 asynStatus VirtualMotorAxis::move(double position, int relative, double minVelocity, double maxVelocity, double acceleration)
 {
   asynStatus status;
@@ -227,6 +244,14 @@ asynStatus VirtualMotorAxis::home(double minVelocity, double maxVelocity, double
 */
 
 
+/*
+ * moveVelocity is called by asynMotor device support when a jog is requested
+ *
+ * Arguments in terms of motor record fields:
+ *     minVelocity (steps/s) = VBAS / abs(MRES)
+ *     maxVelocity (step/s) = (jog_direction == forward) ? JVEL * DIR / MRES : -1 * JVEL * DIR / MRES
+ *     acceleration (step/s/s) = JAR / abs(EGU)
+ */
 asynStatus VirtualMotorAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
 {
   asynStatus status;
@@ -252,6 +277,13 @@ asynStatus VirtualMotorAxis::stop(double acceleration )
 }
 
 
+/*
+ * setPosition is called by asynMotor device support when a position is redefined.
+ * IAMHERE
+ *
+ * Arguments in terms of motor record fields:
+ *     position (steps) = RVAL = DVAL / MRES
+ */
 asynStatus VirtualMotorAxis::setPosition(double position)
 {
   asynStatus status;
