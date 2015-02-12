@@ -210,8 +210,8 @@ extern "C" int VirtualMotorCreateAxis(const char *VirtualMotorName, int axisNo, 
 void VirtualMotorAxis::report(FILE *fp, int level)
 {
   if (level > 0) {
-    fprintf(fp, "    axis %d\n", axisNo_);
-    fprintf(fp, "    axis index %d\n", axisIndex_);
+    fprintf(fp, "    Axis #%d\n", axisNo_);
+    fprintf(fp, "        axisIndex_=%d\n", axisIndex_);
  }
 
   /*
