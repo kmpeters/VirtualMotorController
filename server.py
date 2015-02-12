@@ -117,6 +117,12 @@ def main(args):
 
 
 if __name__ == '__main__':
+	# Check the python version
+	if sys.version_info < (2,7,0):
+		sys.stderr.write("You need Python 2.7 or later to run this script\n")
+		sys.exit(1)
+
+	# Try to run the server
 	try:
 		main(sys.argv)
 	except Exception, e:
