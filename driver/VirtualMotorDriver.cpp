@@ -101,8 +101,10 @@ extern "C" int VirtualMotorCreateController(const char *portName, const char *Vi
   */
 void VirtualMotorController::report(FILE *fp, int level)
 {
-  fprintf(fp, "MVP 2001 motor driver %s, numAxes=%d, moving poll period=%f, idle poll period=%f\n", 
-    this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
+  fprintf(fp, "Virtual Motor Controller driver %s\n", this->portName);
+  fprintf(fp, "    numAxes=%d\n", numAxes_);
+  fprintf(fp, "    moving poll period=%f\n", movingPollPeriod_);
+  fprintf(fp, "    idle poll period=%f\n", idlePollPeriod_);
 
   /*
    * It is a good idea to print private variables that were added to the VirtualMotorController class in VirtualMotorDriver.h, here
@@ -208,8 +210,8 @@ extern "C" int VirtualMotorCreateAxis(const char *VirtualMotorName, int axisNo, 
 void VirtualMotorAxis::report(FILE *fp, int level)
 {
   if (level > 0) {
-    fprintf(fp, "  axis %d\n", axisNo_);
-    fprintf(fp, "  axis index %d\n", axisIndex_);
+    fprintf(fp, "    axis %d\n", axisNo_);
+    fprintf(fp, "    axis index %d\n", axisIndex_);
  }
 
   /*
