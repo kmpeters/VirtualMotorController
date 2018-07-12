@@ -1,0 +1,55 @@
+<html>
+<title>Motor Class</title>
+
+<style type="text/css">
+#wrap {
+   width:85%;
+   margin:0 auto;
+}
+#center_col {
+   float:left;
+   width:100%;
+}
+</style>
+
+<center>
+
+<br>
+<h1>EPICS Training 2015</h1>
+<h2>Using Motors & Motor Control Internals</h2>
+
+</center>
+
+<hr>
+
+<div id="wrap">
+    <div id="center_col">
+
+    <h2>Download the IOC</h2>
+    The IOC can be downloaded from here:
+    <a href="http://www.xray.aps.anl.gov/~kpetersn/motorFiles/vmc.zip">vmc.zip</a><br>
+    
+    <h2>Install the IOC</h2>
+    Unzip the IOC anywhere on your system where it is convenient.  This will create a "vmc" directory.<br>
+    
+    <h2>Configure the IOC</h2>
+    You should only need to modify one line of one file:
+    <li>Replace "vmc" with your initials on line 4 of <code><b>ENV_WINDOWS.bat</b></code></li>
+    This changes the PV prefix, which is necessary to avoid PV name collisions.<br>
+    
+    <h2>Run the Virtual Motor Controller</h2>
+    Double-click: <code><b>start_vmc1_windows.bat</b></code><br>
+
+    <h2>Start MEDM</h2>
+    Double-click: <code><b>start_medm_windows.bat</b></code><br>
+
+    <h2>Start the IOC</h2>
+    If you're running 32-bit Windows, double-click: <code><b>start_ioc_win32-x86.bat</b></code><br>
+    If you're running 64-bit Windows, double-click: <code><b>start_ioc_windows-x64.bat</b></code><br>
+
+    <br><br>
+    <a href="motorClass.html">Return to main page</a>
+    <br><br>
+    </div>
+
+</html>
